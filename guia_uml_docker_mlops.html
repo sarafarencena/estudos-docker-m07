@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia de Revisão — UML, Docker e MLOps</title>
+<style>
+:root{
+  --bg:#f6f8fb; --paper:#ffffff; --ink:#172033; --muted:#5f6b7a;
+  --blue:#3157d5; --blue2:#eaf0ff; --green:#198754; --green2:#e9f7ef;
+  --amber:#a96d00; --amber2:#fff6df; --red:#b23b3b; --red2:#fdecec;
+  --purple:#6c4ac7; --purple2:#f1edff; --line:#dfe5ee; --code:#111827;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color:var(--ink); background:var(--bg); line-height:1.55;
+}
+header{
+  background:linear-gradient(135deg,#172554,#3157d5 65%,#5274e6);
+  color:white; padding:48px 24px 34px;
+}
+header .wrap{max-width:1120px;margin:auto}
+h1{font-size:clamp(2rem,4vw,3.45rem);margin:0 0 10px;line-height:1.05}
+.subtitle{max-width:860px;font-size:1.08rem;opacity:.95}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.badge{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);padding:7px 10px;border-radius:999px;font-size:.9rem}
+nav{
+  position:sticky; top:0; z-index:10; background:rgba(255,255,255,.95);
+  backdrop-filter:blur(9px); border-bottom:1px solid var(--line);
+}
+nav .wrap{max-width:1120px;margin:auto;display:flex;gap:6px;overflow:auto;padding:9px 14px}
+nav a{color:var(--ink);text-decoration:none;padding:7px 10px;border-radius:8px;white-space:nowrap;font-size:.92rem}
+nav a:hover{background:var(--blue2);color:var(--blue)}
+main{max-width:1120px;margin:26px auto 70px;padding:0 18px}
+section{scroll-margin-top:74px;margin:34px 0}
+h2{font-size:1.85rem;margin:0 0 14px}
+h3{font-size:1.25rem;margin-top:24px}
+h4{font-size:1.05rem;margin-top:18px}
+p{margin:9px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{
+  background:var(--paper); border:1px solid var(--line); border-radius:14px;
+  padding:18px; box-shadow:0 4px 18px rgba(26,43,78,.04)
+}
+.card h3,.card h4{margin-top:0}
+.callout{border-left:5px solid var(--blue);background:var(--blue2);padding:14px 16px;border-radius:10px;margin:14px 0}
+.good{border-left-color:var(--green);background:var(--green2)}
+.warn{border-left-color:var(--amber);background:var(--amber2)}
+.bad{border-left-color:var(--red);background:var(--red2)}
+.purple{border-left-color:var(--purple);background:var(--purple2)}
+.key{font-weight:700;color:var(--blue)}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;margin:12px 0 20px}
+th,td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{background:#f0f3f8}
+tr:last-child td{border-bottom:none}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#eef1f6;padding:2px 5px;border-radius:5px}
+pre{background:var(--code);color:#f7fafc;padding:15px;border-radius:11px;overflow:auto;font-size:.9rem;line-height:1.45}
+.flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:14px 0}
+.flow .box{background:white;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-weight:700}
+.arrow{font-weight:800;color:var(--blue);font-size:1.2rem}
+.small{font-size:.9rem;color:var(--muted)}
+.kid{font-size:1.02rem}
+.checklist{list-style:none;padding:0;margin:10px 0}
+.checklist li{padding:7px 0 7px 29px;position:relative}
+.checklist li:before{content:"✓";position:absolute;left:0;top:7px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--green2);color:var(--green);font-weight:800}
+.trap{list-style:none;padding-left:0}
+.trap li{margin:8px 0;padding:9px 11px;border-radius:8px;background:var(--red2)}
+details{background:white;border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin:9px 0}
+summary{cursor:pointer;font-weight:700}
+.diagram{background:#fbfcff;border:1px dashed #b9c6dc;border-radius:12px;padding:16px;margin:12px 0}
+.lanes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.lane{border-top:4px solid var(--blue);padding-top:8px}
+.seq-msg{grid-column:1/-1;text-align:left;background:white;border:1px solid var(--line);padding:7px 10px;border-radius:8px;margin-top:4px}
+.pill{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.78rem;font-weight:700;background:var(--purple2);color:var(--purple)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.two{grid-template-columns:1fr}.lanes{grid-template-columns:1fr 1fr}}
+.footer{font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
+.quiz-q{font-weight:700}
+.answer{margin-top:8px;padding:10px;border-radius:8px;background:#f4f7fb}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>UML, Docker e MLOps</h1>
+    <p class="subtitle">Guia para entender <strong>como pensar o problema</strong>, escolher o recurso certo, testar a solução e explicar as decisões com suas próprias palavras — sem depender de decorar sintaxe.</p>
+    <div class="badges">
+      <span class="badge">Foco: arquitetura</span>
+      <span class="badge">Foco: problema → recurso</span>
+      <span class="badge">Foco: evidência de teste</span>
+      <span class="badge">Foco: README explicável</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#visao">Visão geral</a>
+    <a href="#uml">UML</a>
+    <a href="#docker">Docker</a>
+    <a href="#multistage">Multi-stage</a>
+    <a href="#compose">Compose e redes</a>
+    <a href="#diagnostico">Diagnóstico</a>
+    <a href="#mlops">MLOps</a>
+    <a href="#readme">README</a>
+    <a href="#5c">Ciclo 5C</a>
+    <a href="#pegadinhas">Pegadinhas</a>
+    <a href="#quiz">Autoavaliação</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="visao">
+  <h2>1. O que provavelmente está sendo avaliado</h2>
+  <div class="callout kid">
+    <strong>Pense como uma criança montando uma cidade de LEGO.</strong> Não basta saber encaixar peças. Você precisa saber: quais casas existem, quem fala com quem, por onde passam as ruas, qual peça resolve cada problema e como provar que a cidade funciona.
+  </div>
+
+  <div class="flow">
+    <div class="box">Entender a aplicação</div><div class="arrow">→</div>
+    <div class="box">Desenhar o fluxo</div><div class="arrow">→</div>
+    <div class="box">Containerizar serviços</div><div class="arrow">→</div>
+    <div class="box">Conectar serviços</div><div class="arrow">→</div>
+    <div class="box">Testar</div><div class="arrow">→</div>
+    <div class="box">Explicar</div>
+  </div>
+
+  <p>O ponto central é responder perguntas como:</p>
+  <ul>
+    <li><strong>Quantos serviços existem?</strong></li>
+    <li><strong>Quem chama quem?</strong></li>
+    <li><strong>Em qual porta cada serviço escuta?</strong></li>
+    <li><strong>O que precisa estar acessível pelo computador e o que só precisa ser acessível entre containers?</strong></li>
+    <li><strong>Que recurso resolve o problema: Dockerfile, rede, Compose, volume, healthcheck, multi-stage?</strong></li>
+    <li><strong>Que teste prova que a decisão funcionou?</strong></li>
+  </ul>
+
+  <div class="callout good">
+    <strong>Regra de ouro:</strong> uma decisão técnica fica forte quando você consegue dizer <em>problema → decisão → evidência</em>.
+  </div>
+</section>
+
+<section id="uml">
+  <h2>2. UML — desenhar antes de construir</h2>
+
+  <div class="callout kid">
+    <strong>Explicação para 7 anos:</strong> UML é como desenhar o mapa de uma brincadeira antes de começar. Um desenho mostra <em>quem participa</em>, outro mostra <em>quem conversa com quem</em>, outro mostra <em>onde cada coisa mora</em>.
+  </div>
+
+  <h3>2.1 Qual diagrama usar?</h3>
+  <table>
+    <thead><tr><th>Se a pergunta é...</th><th>Diagrama mais útil</th><th>O que ele mostra</th></tr></thead>
+    <tbody>
+      <tr><td>“O que o usuário consegue fazer?”</td><td><strong>Casos de uso</strong></td><td>Atores e funcionalidades do sistema.</td></tr>
+      <tr><td>“Qual é a ordem das chamadas?”</td><td><strong>Sequência</strong></td><td>Mensagens ao longo do tempo entre usuário, frontend, backend, banco, modelo etc.</td></tr>
+      <tr><td>“Quais partes de software existem?”</td><td><strong>Componentes</strong></td><td>Blocos do sistema e dependências.</td></tr>
+      <tr><td>“Onde cada parte roda?”</td><td><strong>Implantação / deployment</strong></td><td>Nós de execução: servidor, VM, container, dispositivo.</td></tr>
+      <tr><td>“Como as classes se relacionam?”</td><td><strong>Classes</strong></td><td>Estrutura estática: classes, atributos, métodos, relações.</td></tr>
+      <tr><td>“Qual é o fluxo de passos e decisões?”</td><td><strong>Atividades</strong></td><td>Etapas, caminhos alternativos e paralelismo.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 Casos de uso</h3>
+  <div class="two">
+    <div class="card">
+      <h4>Pergunta respondida</h4>
+      <p><strong>Quem usa o sistema e para fazer o quê?</strong></p>
+      <p>Ator não é necessariamente uma pessoa. Pode ser outro sistema externo.</p>
+    </div>
+    <div class="card">
+      <h4>Exemplo</h4>
+      <p>Ator: <strong>Cliente</strong></p>
+      <p>Casos de uso: <strong>Consultar cotação</strong>, <strong>Ver histórico</strong>.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Include × Extend:</strong><br>
+    <code>include</code> = comportamento obrigatório/reutilizado. Ex.: “Fazer compra” sempre inclui “Autenticar”.<br>
+    <code>extend</code> = comportamento opcional/condicional. Ex.: “Aplicar cupom” pode estender “Finalizar compra”.
+  </div>
+
+  <h3>2.3 Diagrama de sequência — provavelmente o mais útil para Docker</h3>
+  <p>Ele mostra <strong>a ordem das mensagens</strong>. Leia de cima para baixo.</p>
+
+  <div class="diagram">
+    <div class="lanes">
+      <div class="lane">Usuário</div>
+      <div class="lane">Frontend</div>
+      <div class="lane">Backend</div>
+      <div class="lane">Modelo</div>
+      <div class="seq-msg">1. Usuário → Frontend: “quero uma previsão”</div>
+      <div class="seq-msg">2. Frontend → Backend: requisição HTTP</div>
+      <div class="seq-msg">3. Backend → Modelo: executar inferência</div>
+      <div class="seq-msg">4. Modelo → Backend: probabilidade</div>
+      <div class="seq-msg">5. Backend → Frontend → Usuário: resposta</div>
+    </div>
+  </div>
+
+  <p><strong>Por que isso ajuda no Docker?</strong> Porque você descobre exatamente quais containers precisam conversar e em qual direção.</p>
+
+  <h4>Fragmentos úteis</h4>
+  <table>
+    <thead><tr><th>Elemento</th><th>Leia como...</th><th>Exemplo</th></tr></thead>
+    <tbody>
+      <tr><td><code>alt</code></td><td>if / else</td><td>Se dados válidos → 200; senão → 400.</td></tr>
+      <tr><td><code>opt</code></td><td>if sem else</td><td>Se risco &gt; 0,8 → enviar alerta.</td></tr>
+      <tr><td><code>loop</code></td><td>repetição</td><td>A cada minuto → ler sensor.</td></tr>
+      <tr><td><code>par</code></td><td>ações paralelas</td><td>Salvar log e enviar métrica ao mesmo tempo.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.4 Componentes × implantação</h3>
+  <div class="two">
+    <div class="card">
+      <h4>Componentes</h4>
+      <p>Mostra <strong>as partes lógicas do software</strong>: frontend, API, serviço de modelo, banco.</p>
+      <p class="small">Pergunta: “Quais blocos existem e dependem de quais outros?”</p>
+    </div>
+    <div class="card">
+      <h4>Implantação</h4>
+      <p>Mostra <strong>onde essas partes rodam</strong>: host, container A, container B, servidor, nuvem.</p>
+      <p class="small">Pergunta: “Onde fisicamente/logicamente cada artefato executa?”</p>
+    </div>
+  </div>
+
+  <div class="callout bad">
+    <strong>Pegadinha:</strong> diagrama de sequência não é para desenhar a estrutura permanente do sistema; ele é para mostrar <strong>interações ao longo do tempo</strong>. Diagrama de componentes não substitui um sequência.
+  </div>
+</section>
+
+<section id="docker">
+  <h2>3. Docker — empacotar para executar de forma previsível</h2>
+
+  <div class="callout kid">
+    <strong>Explicação para 7 anos:</strong> imagine que seu programa é um brinquedo que só funciona se tiver pilhas, peças e instruções certas. Docker coloca o brinquedo e tudo que ele precisa em uma caixa padronizada.
+  </div>
+
+  <h3>3.1 O fluxo que você precisa saber de cabeça</h3>
+  <div class="flow">
+    <div class="box">Dockerfile</div><div class="arrow">→ build →</div>
+    <div class="box">Imagem</div><div class="arrow">→ run →</div>
+    <div class="box">Container</div>
+  </div>
+
+  <table>
+    <thead><tr><th>Conceito</th><th>O que é</th><th>Pergunta mental</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Dockerfile</strong></td><td>Receita para construir uma imagem.</td><td>“Como preparo o ambiente?”</td></tr>
+      <tr><td><strong>Build</strong></td><td>Processo que lê a receita e gera a imagem.</td><td>“Consegui montar o pacote?”</td></tr>
+      <tr><td><strong>Imagem</strong></td><td>Molde/pacote imutável usado para criar containers.</td><td>“Qual versão do pacote vou executar?”</td></tr>
+      <tr><td><strong>Run</strong></td><td>Ação de criar/iniciar um container a partir da imagem.</td><td>“Quero executar esta imagem.”</td></tr>
+      <tr><td><strong>Container</strong></td><td>Instância em execução da imagem, com camada gravável.</td><td>“O processo está vivo?”</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 Como ler um Dockerfile sem decorar sintaxe</h3>
+  <pre>FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["python", "app.py"]</pre>
+
+  <p>Leia em português:</p>
+  <ol>
+    <li><code>FROM</code>: “comece de uma base que já tem Python”.</li>
+    <li><code>WORKDIR</code>: “trabalhe dentro desta pasta”.</li>
+    <li><code>COPY</code>: “leve arquivos do projeto para a imagem”.</li>
+    <li><code>RUN</code>: “execute algo <strong>durante o build</strong>”.</li>
+    <li><code>EXPOSE</code>: “documente que a aplicação escuta nessa porta”.</li>
+    <li><code>CMD</code>: “quando o container iniciar, execute isto”.</li>
+  </ol>
+
+  <div class="callout warn">
+    <strong>RUN ≠ CMD.</strong><br>
+    <code>RUN</code> acontece na construção da imagem.<br>
+    <code>CMD</code> define o comando padrão quando o container é iniciado.
+  </div>
+
+  <h3>3.3 O que observar se receber um Flask pronto</h3>
+  <ul class="checklist">
+    <li>Qual arquivo inicia a aplicação?</li>
+    <li>Quais dependências precisam ser instaladas?</li>
+    <li>Qual porta o Flask usa?</li>
+    <li>Ele escuta em <code>0.0.0.0</code> dentro do container?</li>
+    <li>Ele precisa chamar outro serviço? Qual URL espera?</li>
+    <li>Quais variáveis de ambiente existem?</li>
+    <li>Existe endpoint simples como <code>/health</code> para teste?</li>
+  </ul>
+
+  <div class="callout bad">
+    <strong>Pegadinha Flask:</strong> dentro de um container, escutar somente em <code>127.0.0.1</code>/<code>localhost</code> pode impedir acesso externo ao processo. Para ser alcançável pela rede do container, o servidor normalmente precisa escutar em <code>0.0.0.0</code>.
+  </div>
+</section>
+
+<section id="multistage">
+  <h2>4. Multi-stage — separar “construir” de “rodar”</h2>
+  <div class="callout kid">
+    <strong>Analogia:</strong> para construir uma casinha você usa furadeira, serrote e escada. Depois de pronta, você não precisa morar com a furadeira e o serrote dentro da sala.
+  </div>
+
+  <div class="flow">
+    <div class="box">Stage 1: Builder<br><span class="small">compilador + ferramentas</span></div>
+    <div class="arrow">→ copia só o artefato →</div>
+    <div class="box">Stage 2: Runtime<br><span class="small">somente o necessário para executar</span></div>
+  </div>
+
+  <p><strong>Quando usar?</strong> Quando existem ferramentas necessárias apenas para gerar o artefato final, como compiladores, Node para construir um frontend ou dependências de build.</p>
+
+  <p><strong>Benefícios:</strong></p>
+  <ul>
+    <li>imagem final menor;</li>
+    <li>menos componentes desnecessários;</li>
+    <li>menor superfície de ataque;</li>
+    <li>deploy e transferência mais leves.</li>
+  </ul>
+
+  <div class="callout bad">
+    <strong>Pegadinha:</strong> multi-stage fica no <strong>Dockerfile</strong>, não no Compose. O Compose coordena serviços; o multi-stage define como uma imagem é construída.
+  </div>
+</section>
+
+<section id="compose">
+  <h2>5. Compose, redes e comunicação entre serviços</h2>
+
+  <div class="callout kid">
+    <strong>Analogia:</strong> Dockerfile ensina a construir cada casa. Docker Compose desenha o condomínio: quais casas existem, quais ruas conectam elas, quais portas ficam abertas e quais dependem de outras.
+  </div>
+
+  <h3>5.1 Dockerfile × Compose</h3>
+  <table>
+    <thead><tr><th>Dockerfile</th><th>Docker Compose</th></tr></thead>
+    <tbody>
+      <tr><td>Constrói a imagem de um serviço.</td><td>Define e coordena múltiplos serviços.</td></tr>
+      <tr><td>Base, dependências, arquivos, comando.</td><td>Build/image, portas, redes, volumes, variáveis, dependências.</td></tr>
+      <tr><td>Pergunta: “como construo este serviço?”</td><td>Pergunta: “como a aplicação inteira sobe e se conecta?”</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 Serviço A falando com serviço B</h3>
+  <div class="flow">
+    <div class="box">Cliente</div><div class="arrow">→</div>
+    <div class="box">Serviço A<br><span class="small">porta publicada</span></div>
+    <div class="arrow">→ rede interna →</div>
+    <div class="box">Serviço B<br><span class="small">porta interna</span></div>
+  </div>
+
+  <p>Em uma rede do Compose, os serviços conseguem se localizar pelo <strong>nome do serviço</strong>. Exemplo conceitual:</p>
+  <pre>servico-a chama http://servico-b:5000/health</pre>
+
+  <div class="callout bad">
+    <strong>Pegadinha campeã:</strong> dentro do container A, <code>localhost</code> significa <strong>o próprio container A</strong>, não o container B e não o seu computador.
+  </div>
+
+  <h3>5.3 ports × expose × EXPOSE</h3>
+  <table>
+    <thead><tr><th>Recurso</th><th>Publica no computador?</th><th>Para que serve</th></tr></thead>
+    <tbody>
+      <tr><td><code>EXPOSE 5000</code> no Dockerfile</td><td>Não</td><td>Documenta a porta esperada pela imagem.</td></tr>
+      <tr><td><code>expose:</code> no Compose</td><td>Não</td><td>Documenta a porta interna do serviço.</td></tr>
+      <tr><td><code>ports: "8080:80"</code></td><td><strong>Sim</strong></td><td>Mapeia HOST:CONTAINER.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <strong>Leia “8080:80” assim:</strong> no meu computador entro pela porta <strong>8080</strong>; dentro do container o processo está na porta <strong>80</strong>.
+  </div>
+
+  <h3>5.4 depends_on × healthcheck</h3>
+  <p><code>depends_on</code> organiza a inicialização, mas <strong>iniciar o container não significa que a aplicação já está pronta</strong>.</p>
+  <p>Se você precisa esperar o serviço realmente responder, combine a dependência com um <strong>healthcheck</strong>.</p>
+
+  <div class="two">
+    <div class="card">
+      <h4>Container “started”</h4>
+      <p>O processo do container foi iniciado.</p>
+    </div>
+    <div class="card">
+      <h4>Serviço “healthy”</h4>
+      <p>Um teste definido confirmou que a aplicação está respondendo corretamente.</p>
+    </div>
+  </div>
+
+  <h3>5.5 Como provar que um serviço fala com o outro</h3>
+  <p>O professor disse que a forma de teste pode ser livre. Então escolha uma evidência simples e explicável.</p>
+
+  <ol>
+    <li>Suba a aplicação.</li>
+    <li>Confirme que os containers estão rodando.</li>
+    <li>Faça A chamar B pela rede interna usando o nome de B.</li>
+    <li>Registre a resposta e o status HTTP.</li>
+    <li>Explique o que a evidência prova.</li>
+  </ol>
+
+  <p>Ferramentas possíveis: <code>curl</code>, Postman, Insomnia, Thunder Client, HTTPie ou um teste simples em Python.</p>
+
+  <div class="callout good">
+    <strong>O teste mais convincente:</strong> uma rota de A chama uma rota de B e devolve o resultado. Assim você prova não apenas que A está vivo, mas que <strong>A consegue resolver o nome de B, abrir conexão e receber uma resposta</strong>.
+  </div>
+
+  <h3>5.6 Volumes — quando os dados precisam sobreviver</h3>
+  <p>Container é descartável. Se os dados precisam sobreviver à recriação do container, use armazenamento persistente.</p>
+  <table>
+    <thead><tr><th>Recurso</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Volume</strong></td><td>Dados gerenciados pelo Docker; comum para bancos.</td></tr>
+      <tr><td><strong>Bind mount</strong></td><td>Mapeia uma pasta do computador para dentro do container; útil em desenvolvimento.</td></tr>
+      <tr><td><strong>tmpfs</strong></td><td>Memória temporária; some ao parar.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="diagnostico">
+  <h2>6. Se quebrar: ordem de raciocínio</h2>
+
+  <div class="callout kid">
+    <strong>Não chute.</strong> Faça igual médico: primeiro veja se o paciente está vivo, depois leia os sintomas, depois teste a conexão.
+  </div>
+
+  <div class="flow">
+    <div class="box">1. Está rodando?</div><div class="arrow">→</div>
+    <div class="box">2. Logs</div><div class="arrow">→</div>
+    <div class="box">3. Porta/host</div><div class="arrow">→</div>
+    <div class="box">4. Rede/DNS</div><div class="arrow">→</div>
+    <div class="box">5. Teste HTTP</div>
+  </div>
+
+  <table>
+    <thead><tr><th>Sintoma</th><th>Hipótese provável</th><th>O que verificar</th></tr></thead>
+    <tbody>
+      <tr><td>Container encerra logo após subir</td><td>Comando principal falhou</td><td>Logs, CMD/ENTRYPOINT, dependências.</td></tr>
+      <tr><td>Funciona dentro do container, não no host</td><td>Porta não publicada ou processo não escuta corretamente</td><td><code>ports</code>, mapeamento HOST:CONTAINER, host <code>0.0.0.0</code>.</td></tr>
+      <tr><td>A não encontra B</td><td>Nome/URL/rede incorretos</td><td>Mesma rede, nome do serviço, porta interna.</td></tr>
+      <tr><td><code>connection refused</code></td><td>Destino existe, mas nada está ouvindo naquela porta</td><td>Porta do processo, readiness, logs.</td></tr>
+      <tr><td>502/503</td><td>Proxy/serviço upstream indisponível</td><td>Logs do proxy e do serviço destino, healthcheck.</td></tr>
+      <tr><td>Dados somem ao recriar container</td><td>Sem persistência</td><td>Volume/bind mount.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Comandos básicos como ferramentas de diagnóstico</h3>
+  <p>Você não precisa decorar todos. Precisa saber <strong>qual pergunta cada um responde</strong>.</p>
+  <table>
+    <thead><tr><th>Pergunta</th><th>Ferramenta típica</th></tr></thead>
+    <tbody>
+      <tr><td>Quais containers estão rodando?</td><td><code>docker ps</code> / <code>docker compose ps</code></td></tr>
+      <tr><td>O que deu errado?</td><td><code>docker logs</code> / <code>docker compose logs</code></td></tr>
+      <tr><td>Quero entrar no container</td><td><code>docker exec</code> / <code>docker compose exec</code></td></tr>
+      <tr><td>Quero validar o Compose</td><td><code>docker compose config</code></td></tr>
+      <tr><td>Quero ver detalhes de rede/volume</td><td><code>docker inspect</code></td></tr>
+      <tr><td>Quero testar HTTP</td><td><code>curl</code> ou equivalente</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="mlops">
+  <h2>7. MLOps — manter ML confiável depois do “funcionou na minha máquina”</h2>
+
+  <div class="callout kid">
+    <strong>Explicação para 7 anos:</strong> treinar um modelo é como ensinar um cachorro um truque. MLOps é cuidar para que você saiba <em>qual cachorro foi treinado, com qual treino, quais regras foram usadas, se ele ainda faz o truque e o que fazer se ele começar a errar</em>.
+  </div>
+
+  <h3>7.1 Docker ajuda MLOps, mas não é MLOps inteiro</h3>
+  <p>Docker ajuda principalmente na <strong>reprodutibilidade do ambiente e empacotamento</strong>. MLOps cobre o ciclo de vida do sistema de ML.</p>
+
+  <div class="flow">
+    <div class="box">Dados</div><div class="arrow">→</div>
+    <div class="box">Pré-processamento</div><div class="arrow">→</div>
+    <div class="box">Treino</div><div class="arrow">→</div>
+    <div class="box">Modelo</div><div class="arrow">→</div>
+    <div class="box">Deploy</div><div class="arrow">→</div>
+    <div class="box">Monitoramento</div>
+  </div>
+
+  <h3>7.2 Reprodutibilidade</h3>
+  <p>Significa conseguir recriar um resultado sabendo quais elementos produziram aquele modelo:</p>
+  <ul>
+    <li>versão dos dados;</li>
+    <li>código;</li>
+    <li>features e pré-processamento;</li>
+    <li>hiperparâmetros;</li>
+    <li>dependências;</li>
+    <li>modelo resultante.</li>
+  </ul>
+
+  <h3>7.3 Versionar modelo sem versionar pré-processamento é perigoso</h3>
+  <div class="callout warn">
+    O modelo aprendeu a trabalhar com uma representação específica. Se o scaler, encoder, ordem das features ou regras de transformação mudam, o mesmo modelo pode receber entradas diferentes das usadas no treino.
+  </div>
+
+  <p>Portanto, pense no deploy como um <strong>pipeline</strong>:</p>
+  <pre>entrada bruta → validação → transformação/encoding/scaling → modelo → pós-processamento → resposta</pre>
+
+  <h3>7.4 Rastreabilidade</h3>
+  <p>Pergunta-chave: <strong>“De onde veio este modelo?”</strong></p>
+  <p>Você deveria conseguir associar um modelo a experimento, métricas, dados, código, configuração e artefatos.</p>
+
+  <h3>7.5 Monitoramento</h3>
+  <p>O modelo pode estar tecnicamente online e ainda assim estar ruim. Monitore duas famílias de sinais:</p>
+  <div class="two">
+    <div class="card">
+      <h4>Sistema</h4>
+      <p>latência, erros, disponibilidade, CPU/memória, filas.</p>
+    </div>
+    <div class="card">
+      <h4>Modelo/dados</h4>
+      <p>distribuição das entradas, qualidade da previsão, drift, taxa de confiança, métricas quando o rótulo chega.</p>
+    </div>
+  </div>
+
+  <h3>7.6 Drift</h3>
+  <table>
+    <thead><tr><th>Tipo</th><th>O que mudou?</th><th>Exemplo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Data drift</strong></td><td>A distribuição de <strong>X</strong> mudou.</td><td>Transações passaram a ter valores muito maiores.</td></tr>
+      <tr><td><strong>Concept drift</strong></td><td>A relação <strong>X → Y</strong> mudou.</td><td>Um padrão que antes indicava fraude agora é comportamento normal.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout bad">
+    <strong>Pegadinha:</strong> retreinar não é automaticamente a primeira resposta. Primeiro detecte, investigue e confirme o problema. A degradação pode vir de dado quebrado, mudança de schema, bug de pré-processamento, latência, mudança de população ou concept drift.
+  </div>
+
+  <h3>7.7 CI/CD em uma frase</h3>
+  <p><strong>CI</strong>: integrar mudanças e validar automaticamente com testes/builds. <strong>CD</strong>: levar uma versão validada até ambientes de execução de forma controlada.</p>
+  <p>Em MLOps, o pipeline pode incluir testes de dados, pré-processamento, modelo, imagem Docker, integração entre serviços e critérios antes do deploy.</p>
+</section>
+
+<section id="readme">
+  <h2>8. Como explicar no README com suas próprias palavras</h2>
+  <p>Seu README deve mostrar <strong>compreensão</strong>, não apenas listar comandos.</p>
+
+  <div class="card">
+    <h3>Estrutura simples</h3>
+    <ol>
+      <li><strong>Problema:</strong> o que precisava funcionar?</li>
+      <li><strong>Arquitetura:</strong> quais serviços existem e quem chama quem?</li>
+      <li><strong>Decisões:</strong> por que Dockerfile, Compose, rede, porta, volume, multi-stage etc.?</li>
+      <li><strong>Execução:</strong> como a solução é construída e iniciada?</li>
+      <li><strong>Teste:</strong> qual teste foi feito e o que ele prova?</li>
+      <li><strong>Limitações:</strong> o que ainda não está coberto?</li>
+    </ol>
+  </div>
+
+  <h3>Modelo de raciocínio</h3>
+  <div class="callout good">
+    <strong>Problema:</strong> o backend precisava chamar o serviço de estoque.<br>
+    <strong>Decisão:</strong> coloquei ambos na mesma rede do Compose e usei o nome do serviço como hostname.<br>
+    <strong>Evidência:</strong> uma requisição feita pelo backend ao endpoint <code>/health</code> do estoque retornou HTTP 200.<br>
+    <strong>Conclusão:</strong> a resolução de nome e a comunicação HTTP entre os serviços funcionaram.
+  </div>
+
+  <div class="callout bad">
+    <strong>Fraco:</strong> “Usei Docker Compose porque era necessário.”<br><br>
+    <strong>Forte:</strong> “Usei Compose porque a aplicação possui múltiplos serviços que precisam subir com configuração de rede e variáveis de ambiente consistentes; ele centraliza essa orquestração local.”
+  </div>
+</section>
+
+<section id="5c">
+  <h2>9. Ciclo 5C — como usar IA sem terceirizar seu raciocínio</h2>
+  <p>O material fornecido pelo professor enfatiza usar IA para <strong>feedback e validação</strong>, mantendo autoria e verificação de engenharia.</p>
+
+  <div class="grid">
+    <div class="card"><span class="pill">1</span><h3>Contextualizar</h3><p>Defina o problema, requisitos e limites.</p></div>
+    <div class="card"><span class="pill">2</span><h3>Consultar</h3><p>Faça uma dúvida técnica específica.</p></div>
+    <div class="card"><span class="pill">3</span><h3>Confrontar</h3><p>Compare a resposta com documentação e testes.</p></div>
+    <div class="card"><span class="pill">4</span><h3>Construir</h3><p>Adapte a solução ao seu contexto.</p></div>
+    <div class="card"><span class="pill">5</span><h3>Comprovar</h3><p>Mostre evidência e explique sem depender da IA.</p></div>
+  </div>
+
+  <h3>Exemplo aplicado</h3>
+  <table>
+    <thead><tr><th>Etapa</th><th>Exemplo</th></tr></thead>
+    <tbody>
+      <tr><td>Contextualizar</td><td>“A API A precisa chamar a API B dentro do Compose.”</td></tr>
+      <tr><td>Consultar</td><td>“Qual hostname devo usar entre serviços Compose?”</td></tr>
+      <tr><td>Confrontar</td><td>Verificar documentação/configuração e testar.</td></tr>
+      <tr><td>Construir</td><td>Configurar A para usar o nome de B na rede.</td></tr>
+      <tr><td>Comprovar</td><td>Executar requisição, registrar HTTP 200 e explicar por quê.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout purple">
+    Antes de encerrar qualquer tópico, tente responder sem consultar: <strong>“O teste confirma o requisito? Que evidência faria eu mudar de decisão? Eu consigo explicar isso para um colega?”</strong>
+  </div>
+</section>
+
+<section id="pegadinhas">
+  <h2>10. Pegadinhas que valem revisão</h2>
+  <ul class="trap">
+    <li><strong>Imagem ≠ container:</strong> imagem é o molde; container é uma instância em execução.</li>
+    <li><strong>EXPOSE não publica porta:</strong> quem publica é <code>-p</code> ou <code>ports</code>.</li>
+    <li><strong>HOST:CONTAINER:</strong> <code>8080:80</code> não significa o contrário.</li>
+    <li><strong>localhost dentro de A é A:</strong> para chegar em B, use o nome do serviço na rede.</li>
+    <li><strong>depends_on não garante “pronto”:</strong> para readiness, use healthcheck/condição adequada.</li>
+    <li><strong>RUN ≠ CMD:</strong> build versus inicialização do container.</li>
+    <li><strong>Multi-stage ≠ Compose:</strong> um otimiza a construção da imagem; o outro coordena serviços.</li>
+    <li><strong>Volume ≠ imagem:</strong> dados persistentes não devem depender da camada descartável do container.</li>
+    <li><strong>Docker ≠ MLOps completo:</strong> ele resolve parte do empacotamento/reprodutibilidade.</li>
+    <li><strong>Modelo versionado sozinho não basta:</strong> pré-processamento e schema precisam estar alinhados.</li>
+    <li><strong>Data drift ≠ concept drift:</strong> mudou X versus mudou a relação X→Y.</li>
+    <li><strong>Diagrama de sequência ≠ componentes:</strong> tempo/interação versus estrutura.</li>
+    <li><strong>Teste “container está Up” ≠ teste funcional:</strong> prove a comunicação ou comportamento esperado.</li>
+  </ul>
+</section>
+
+<section id="quiz">
+  <h2>11. Autoavaliação — responda antes de abrir</h2>
+
+  <details>
+    <summary>1. Você recebe frontend + Flask API + banco. Qual seria sua primeira ação?</summary>
+    <div class="answer">Entender a arquitetura: quantos serviços existem, portas, dependências, fluxo de chamadas, variáveis e o que precisa ser acessível externamente. Só depois escrever/ajustar Dockerfiles e Compose.</div>
+  </details>
+
+  <details>
+    <summary>2. O frontend consegue abrir, mas a API não é encontrada usando localhost:5000 dentro do frontend. Qual hipótese?</summary>
+    <div class="answer"><code>localhost</code> dentro do container frontend aponta para ele mesmo. Se a API está em outro serviço Compose, use o nome do serviço e a porta interna, por exemplo <code>http://api:5000</code>.</div>
+  </details>
+
+  <details>
+    <summary>3. O professor pede “prove que A fala com B”. O que é uma evidência boa?</summary>
+    <div class="answer">Executar uma requisição de A para B pela rede interna e registrar a resposta/status. Melhor ainda: rota em A chama um <code>/health</code> de B e devolve a resposta.</div>
+  </details>
+
+  <details>
+    <summary>4. A imagem tem 1,5 GB porque contém compilador e ferramentas de build que não são usadas em runtime. O que resolve?</summary>
+    <div class="answer">Multi-stage build: usar um estágio builder com as ferramentas e copiar apenas o artefato necessário para o estágio final de runtime.</div>
+  </details>
+
+  <details>
+    <summary>5. O container iniciou, mas a aplicação ainda não aceita conexões. Por que depends_on sozinho pode falhar?</summary>
+    <div class="answer">Porque ele pode garantir apenas que o container foi iniciado, não que o processo interno esteja pronto. Um healthcheck pode fornecer um critério de prontidão.</div>
+  </details>
+
+  <details>
+    <summary>6. Um banco perde tudo quando o container é removido. Qual recurso?</summary>
+    <div class="answer">Persistência, normalmente com volume Docker.</div>
+  </details>
+
+  <details>
+    <summary>7. Qual diagrama UML mostra melhor “Usuário → Frontend → API → Modelo → resposta”?</summary>
+    <div class="answer">Diagrama de sequência, porque a pergunta é sobre a ordem temporal das mensagens entre participantes.</div>
+  </details>
+
+  <details>
+    <summary>8. O modelo v5 foi colocado em produção com um scaler diferente do usado no treino. Qual risco?</summary>
+    <div class="answer">O modelo pode receber valores em uma representação incompatível com a usada no treinamento. Pré-processamento e modelo devem ser versionados/implantados de forma compatível.</div>
+  </details>
+
+  <details>
+    <summary>9. A distribuição das entradas mudou, mas a regra X→Y continua a mesma. Que drift?</summary>
+    <div class="answer">Data drift.</div>
+  </details>
+
+  <details>
+    <summary>10. O que diferencia um README forte de um README que apenas lista comandos?</summary>
+    <div class="answer">O README forte explica problema, arquitetura, decisão, por que o recurso foi escolhido, teste executado, evidência observada e limitações.</div>
+  </details>
+</section>
+
+<section>
+  <h2>12. Folha de cola final</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>UML</h3>
+      <p><strong>Casos de uso:</strong> quem faz o quê.</p>
+      <p><strong>Sequência:</strong> quem chama quem e em qual ordem.</p>
+      <p><strong>Componentes:</strong> quais blocos existem.</p>
+      <p><strong>Implantação:</strong> onde cada bloco roda.</p>
+    </div>
+    <div class="card">
+      <h3>Docker</h3>
+      <p><strong>Dockerfile → build → imagem → run → container</strong></p>
+      <p><strong>Multi-stage:</strong> builder ≠ runtime.</p>
+      <p><strong>Compose:</strong> coordena serviços.</p>
+      <p><strong>Rede:</strong> serviço chama serviço pelo nome.</p>
+    </div>
+    <div class="card">
+      <h3>MLOps</h3>
+      <p><strong>Reproduzir:</strong> saber reconstruir.</p>
+      <p><strong>Versionar:</strong> modelo + pré-processamento + código/dados.</p>
+      <p><strong>Rastrear:</strong> saber de onde veio.</p>
+      <p><strong>Monitorar:</strong> sistema, dados, modelo e drift.</p>
+    </div>
+  </div>
+</section>
+
+<section class="footer">
+  <p><strong>Base do guia:</strong> materiais e contexto fornecidos no projeto, o guia 5C de uso de IA disponibilizado pelo professor e o repositório de consulta compartilhado pela turma. Conceitos adicionais de MLOps e explicações didáticas foram usados como complemento para conectar os tópicos e preparar para perguntas de aplicação.</p>
+</section>
+
+</main>
+</body>
+</html>
