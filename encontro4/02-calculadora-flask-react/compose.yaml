@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - calculadora-net
+
+  api:
+    build:
+      context: ./api
+    expose:
+      - "5000"
+    networks:
+      - calculadora-net
+
+# Rede de execução dos containers. Ela pertence ao Compose, não ao Dockerfile.
+networks:
+  calculadora-net:
+    driver: bridge
